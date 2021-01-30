@@ -9,7 +9,7 @@ import java.util.List;
 
 import javax.websocket.Session;
 
-class Room {
+public class Room {
     public enum ConnectionStatus {
         SUCCESS,
         INVALID_ROOM,
@@ -27,9 +27,11 @@ class Room {
     synchronized ConnectionStatus join(Session session, String password, String name) {
         if (this.password.equals(password)) {
             sessions.add(session);
-            PlayerState ps = new PlayerState();
-            playerStates.put(name, ps);
 
+            if (playerStates.get(name) == null) {
+                PlayerState ps = new PlayerState();
+                playerStates.put(name, ps);
+            }
             return ConnectionStatus.SUCCESS;
         } else {
             return ConnectionStatus.INVALID_PASSWORD;
@@ -52,6 +54,10 @@ class Room {
                 }
             }
         }
+    }
+
+    public synchronized boolean validConnection(String password) {
+        return this.password.equals(password);
     }
 
     HashMap<String, PlayerState> getRoomState() {

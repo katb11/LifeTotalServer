@@ -53,7 +53,8 @@ public class ChatEndpoint {
                     String json = gson.toJson(room.getRoomState());
                     PlayerAction response = new PlayerAction(action.getUsername(), JOINED, json);
 
-                    room.sendMessage(gson.toJson(response));
+                    String resp = gson.toJson(response);
+                    room.sendMessage(resp);
                 }
                 break;
             case UPDATE_LIFETOTAL: {
