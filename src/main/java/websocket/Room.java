@@ -24,6 +24,10 @@ public class Room {
         this.password = password;
     }
 
+    public synchronized  int getTotalCurrentUsers() {
+        return sessions.size();
+    }
+
     synchronized ConnectionStatus join(Session session, String password, String name) {
         if (this.password.equals(password)) {
             sessions.add(session);

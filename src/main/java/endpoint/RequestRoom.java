@@ -1,5 +1,6 @@
 package endpoint;
 
+import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import model.User;
 import org.json.JSONObject;
 import service.JWT;
@@ -18,6 +19,8 @@ import static websocket.RoomList.getRoomList;
 @WebServlet("/requestRoom")
 public class RequestRoom extends HttpServlet {
 
+    private final int MAX_USERS = 8;
+
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         String body = IOUtils.toString(request.getReader());
@@ -35,19 +38,18 @@ public class RequestRoom extends HttpServlet {
         User u = JWT.decodeJWT(token);
 
         if (u != null) {
-            if (room == null || pass == null) {
-                String roomID = "test";
-                String password = Integer.toString(u.getId());
-                getRoomList().createRoom("test", password);
+            if (room == null) {
+
+                String roomID = getRoomList().createRoom("");
 
                 JSONObject resp = new JSONObject();
                 resp.put("room", roomID);
-                resp.put("password", password);
+                resp.put("password", "");
 
                 response.getWriter().write(resp.toString());
             } else {
                 Room r = getRoomList().getRoom(room);
-                if (r != null && r.validConnection(pass)) {
+                if (r != null && r.validConnection(pass) && r.getTotalCurrentUsers() < MAX_USERS) {
                     JSONObject resp = new JSONObject();
                     resp.put("room", room);
                     resp.put("password", pass);
